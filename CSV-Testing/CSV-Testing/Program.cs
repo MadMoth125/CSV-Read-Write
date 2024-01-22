@@ -7,19 +7,27 @@ namespace CSV_Testing
 {
 	internal class Program
 	{
-		private static readonly string _filePath = "LibraryData.csv";
-
-		// because of how the program is structured, these two objects must be static
 		private static readonly Library CurrentLibrary = new Library();
-		private static CsvFileManager csvManager = new CsvFileManager(_filePath);
-
-		private static string[] menu1 = { "View library catalog", "Add new book", "Remove book" };
+		
+		private static readonly string _filePath = "LibraryData.csv";
+		
+		private static string[] menu1 = { "View library catalog", "Add new book", "Remove book", "Reset library data"};
 		private static string[] menu2 = { "Exit program" };
 
 		private static bool _loopMain = true;
 
 		static void Main(string[] args)
 		{
+			if (File.Exists(_filePath))
+			{
+				CurrentLibrary.LibrarySelection = Library.ConvertCsvToDictionary(CsvFileManager.ReadCsv(_filePath));
+			}
+			else
+			{
+				CurrentLibrary.LibrarySelection = Library.StaticLibrary;
+				// csvManager.WriteCSV();
+			}
+			
 			while (_loopMain)
 			{
 				PrintMenu();
@@ -30,7 +38,7 @@ namespace CSV_Testing
 			return;
 
 			// Read CSV
-			var data = csvManager.ReadCSV();
+			var data = CsvFileManager.ReadCsv(_filePath);
 			Console.WriteLine("Data read from CSV:");
 			CsvFileManager.PrintData(data);
 
@@ -44,11 +52,11 @@ namespace CSV_Testing
 			data.Add(newData);
 
 			// Write CSV
-			csvManager.WriteCSV(data);
+			CsvFileManager.WriteCsv(data, _filePath);
 			Console.WriteLine("Data written to CSV:");
 
 			// Read and print the updated data
-			data = csvManager.ReadCSV();
+			data = CsvFileManager.ReadCsv(_filePath);
 			CsvFileManager.PrintData(data);
 		}
 
@@ -106,7 +114,11 @@ namespace CSV_Testing
 				case 3: // remove book
 					RemoveBook();
 					break;
-				case 4: // exit program
+				case 4: // reset library data
+					CurrentLibrary.LibrarySelection = Library.StaticLibrary;
+					CsvFileManager.WriteCsv(Library.ConvertDictionaryToCsv(CurrentLibrary.LibrarySelection), _filePath);
+					break;
+				case 5: // exit program
 					tempReturnValue = false;
 					_loopMain = false;
 					break;
@@ -121,15 +133,14 @@ namespace CSV_Testing
 		private static void ViewAllBooks()
 		{
 			// Read CSV
-			List<Dictionary<string, string>> data = csvManager.ReadCSV();
-			CurrentLibrary.LibrarySelection = Library.ConvertCSVToDictionary(data);
+			CurrentLibrary.LibrarySelection = Library.ConvertCsvToDictionary(CsvFileManager.ReadCsv(_filePath));
 			SearchManager.PrintBooks(CurrentLibrary.LibrarySelection);
 		}
 
 		private static void AddNewBook()
 		{
 			Console.Write("Enter the book's ISBN: ");
-			ulong tempISBN = GenericReadLine.TryReadLine<ulong>();
+			string tempISBN = GenericReadLine.TryReadLine<string>();
 
 			ConsoleHelper.PrintBlank();
 			Console.Write("Enter the book's title: ");
@@ -145,6 +156,23 @@ namespace CSV_Testing
 				// attempting to add the book to the library
 				if (CurrentLibrary.AddBook(tempISBN, new Book(tempTitle, tempAuthor, BookStatus.Available)))
 				{
+					if (CurrentLibrary.LibrarySelection.TryGetValue(tempISBN, out Book tempBook))
+					{
+						Dictionary<string, Book> tempDictionary = new Dictionary<string, Book>
+						{
+							{ tempISBN, tempBook }
+						};
+						
+						// converting dictionary to csv
+						var tempCsv = Library.ConvertDictionaryToCsv(tempDictionary);
+						
+						// clear contents of existing csv file
+						CsvFileManager.ClearCsvFile(_filePath);
+						
+						// write new csv file
+						CsvFileManager.WriteCsv(tempCsv, _filePath);
+					}
+					
 					// clearing console and printing menu again to prevent clutter
 					Console.Clear();
 					PrintMenu();
@@ -167,7 +195,7 @@ namespace CSV_Testing
 					Console.WriteLine("A book with that ISBN already exists.");
 					Console.Write("Please enter a different ISBN: ");
 
-					tempISBN = GenericReadLine.TryReadLine<ulong>();
+					tempISBN = GenericReadLine.TryReadLine<string>();
 					break;
 				}
 			}
@@ -176,7 +204,7 @@ namespace CSV_Testing
 		private static void RemoveBook()
 		{
 			Console.Write("Enter the ISBN of the book you wish to remove: ");
-			ulong tempISBN = GenericReadLine.TryReadLine<ulong>();
+			string tempISBN = GenericReadLine.TryReadLine<string>();
 
 			// clearing console and printing menu again to prevent clutter
 			Console.Clear();
@@ -187,6 +215,15 @@ namespace CSV_Testing
 			{
 				Console.WriteLine("Successfully removed book: ");
 				SearchManager.PrintBook(tempISBN, removedBook, false);
+				
+				// converting dictionary to csv
+				var tempCsv = Library.ConvertDictionaryToCsv(CurrentLibrary.LibrarySelection);
+						
+				// clear contents of existing csv file
+				CsvFileManager.ClearCsvFile(_filePath);
+						
+				// write new csv file
+				CsvFileManager.WriteCsv(tempCsv, _filePath);
 			}
 			else
 			{
