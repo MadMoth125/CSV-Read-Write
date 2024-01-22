@@ -1,7 +1,12 @@
-﻿using CSV_Testing.Classes;
-
-namespace LibraryCatalogSystem
+﻿namespace LibraryCatalogSystem
 {
+	/*
+	 * Because of how ulong's leading 0's are handled when run through .ToString(),
+	 * ISBNs are stored as strings instead to preserve every digit.
+	 *
+	 * Opening the CSV file in Excel will cause it to have a hissy fit
+	 * about there being leading 0's, but it's fine.
+	 */
 	public class Library
 	{
 		///	<summary>
@@ -9,18 +14,23 @@ namespace LibraryCatalogSystem
 		///	</summary>
 		public static Dictionary<string, Book> StaticLibrary { get; } = new Dictionary<string, Book>
 		{
-			{ "0084", new Book("To Kill a	Mockingbird", "Harper Lee", BookStatus.Available) },
-			{ "9970", new Book("Pride	and	Prejudice", "Jane Austen", BookStatus.Available) },
+			{ "0084", new Book("To Kill a Mockingbird", "Harper Lee", BookStatus.Available) },
+			{ "9970", new Book("Pride and Prejudice", "Jane Austen", BookStatus.Available) },
 			{ "6225", new Book("The Da Vinci Code", "Dan Brown", BookStatus.Available) },
 			{ "3415", new Book("The Hobbit", "J.R.R. Tolkien", BookStatus.Available) },
 			{ "0803", new Book("1984", "George Orwell", BookStatus.Available) },
 			{ "4113", new Book("The Catcher in the Rye", "J.D. Salinger", BookStatus.Available) },
-			{ "2719", new Book("Dune", "Frank	Herbert", BookStatus.Available) },
-			{ "0524", new Book("The Great	Gatsby", "F. Scott Fitzgerald", BookStatus.Available) }
+			{ "2719", new Book("Dune", "Frank Herbert", BookStatus.Available) },
+			{ "0524", new Book("The Great Gatsby", "F. Scott Fitzgerald", BookStatus.Available) }
 		};
 
 		public Dictionary<string, Book> LibrarySelection = new Dictionary<string, Book>();
 
+		/// <summary>
+		/// Function to convert a dictionary of books to a CSV-friendly format
+		/// </summary>
+		/// <param name="libraryDictionary">The dictionary of books to convert</param>
+		/// <returns>A list of dictionaries, each representing a row in the CSV</returns>
 		public static List<Dictionary<string, string>> ConvertDictionaryToCsv(Dictionary<string, Book> libraryDictionary)
 		{
 			List<Dictionary<string, string>> csvData = new List<Dictionary<string, string>>();
@@ -40,6 +50,11 @@ namespace LibraryCatalogSystem
 			return csvData;
 		}
 		
+		/// <summary>
+		/// Function to convert our CSV format to a dictionary of books
+		/// </summary>
+		/// <param name="csvData">The CSV file to parse for our book data</param>
+		/// <returns>A dictionary of books</returns>
 		public static Dictionary<string, Book> ConvertCsvToDictionary(List<Dictionary<string, string>> csvData)
 		{
 			Dictionary<string, Book> libraryDictionary = new Dictionary<string, Book>();
@@ -47,7 +62,6 @@ namespace LibraryCatalogSystem
 			foreach (var row in csvData)
 			{
 				bool validIsbn = row.TryGetValue("ISBN", out var isbnString);
-				// bool validIsbnNumber = ulong.TryParse(isbnString, out ulong isbn);
 				bool validTitle = row.TryGetValue("Title", out var title);
 				bool validAuthor = row.TryGetValue("Author", out var author);
 				bool validStatus = row.TryGetValue("Status", out var statusString);

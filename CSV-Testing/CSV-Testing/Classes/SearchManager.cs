@@ -13,7 +13,7 @@ namespace LibraryCatalogSystem
 		{
 			if (books.Count < 1)
 			{
-				Console.WriteLine("Couldn't	find any books with	that parameter.");
+				Console.WriteLine("No books currently available.");
 			}
 			else
 			{
@@ -34,14 +34,8 @@ namespace LibraryCatalogSystem
 		///	<param name="book">Book	reference</param>
 		public static void PrintBook(string isbn, Book book, bool printStatus = true)
 		{
-			if (printStatus)
-			{
-				Console.WriteLine($"{book.Title} by	{book.Author} |	Status:	{book.Status}, ISBN: {isbn}");
-			}
-			else
-			{
-				Console.WriteLine($"{book.Title} by	{book.Author} |	ISBN: {isbn}");
-			}
+			if (printStatus) Console.WriteLine($"{book.Title} by {book.Author} | Status: {book.Status}, ISBN: {isbn}");
+			else Console.WriteLine($"{book.Title} by {book.Author} | ISBN: {isbn}");
 		}
 
 		///	<summary>
@@ -50,6 +44,7 @@ namespace LibraryCatalogSystem
 		///	<param name="isbn">The search parameter</param>
 		///	<param name="catalog">The Dictionary that will be searched</param>
 		///	<param name="results">The returned Dictionary of books that	meet the search	parameters</param>
+		[Obsolete("Functionality not used in program")]
 		public static void SearchByISBN(string isbn, Dictionary<string, Book> catalog, out Dictionary<string, Book> results)
 		{
 			// using LINQ to filter	results
@@ -65,6 +60,7 @@ namespace LibraryCatalogSystem
 		///	<param name="title">The	search parameter</param>
 		///	<param name="catalog">The Dictionary that will be searched</param>
 		///	<param name="results">The returned Dictionary of books that	meet the search	parameters</param>
+		[Obsolete("Functionality not used in program")]
 		public static void SearchByTitle(string title, Dictionary<string, Book> catalog, out Dictionary<string, Book> results)
 		{
 			// using LINQ to filter	results
@@ -80,6 +76,7 @@ namespace LibraryCatalogSystem
 		///	<param name="author">The search	parameter</param>
 		///	<param name="catalog">The Dictionary that will be searched</param>
 		///	<param name="results">The returned Dictionary of books that	meet the search	parameters</param>
+		[Obsolete("Functionality not used in program")]
 		public static void SearchByAuthor(string author, Dictionary<string, Book> catalog, out Dictionary<string, Book> results)
 		{
 			// using LINQ to filter	results
@@ -94,6 +91,7 @@ namespace LibraryCatalogSystem
 		///	</summary>
 		///	<param name="isbn">The search parameter</param>
 		///	<param name="catalog">The Dictionary that will be searched</param>
+		[Obsolete("Functionality not used in program")]
 		public static void CheckOutBook(string isbn, ref Dictionary<string, Book> catalog)
 		{
 			ConsoleHelper.PrintBlank();
@@ -122,6 +120,7 @@ namespace LibraryCatalogSystem
 		///	</summary>
 		///	<param name="isbn">The search parameter</param>
 		///	<param name="catalog">The Dictionary that will be searched</param>
+		[Obsolete("Functionality not used in program")]
 		public static void ReturnBook(string isbn, ref Dictionary<string, Book> catalog)
 		{
 			ConsoleHelper.PrintBlank();
