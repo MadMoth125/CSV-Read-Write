@@ -9,19 +9,12 @@ namespace CSV_Testing.Classes
 {
 	public class CsvFileManager
 	{
-		private string filePath;
-
-		public CsvFileManager(string filePath)
-		{
-			this.filePath = filePath;
-		}
-
-		public List<Dictionary<string, string>> ReadCSV()
+		public static List<Dictionary<string, string>> ReadCsv(string path)
 		{
 			List<Dictionary<string, string>> data = new List<Dictionary<string, string>>();
 			try
 			{
-				using (var reader = new StreamReader(filePath))
+				using (var reader = new StreamReader(path))
 				{
 					string[] headers = reader.ReadLine()?.Split(',');
 					while (!reader.EndOfStream)
@@ -41,20 +34,21 @@ namespace CSV_Testing.Classes
 			}
 			catch (FileNotFoundException)
 			{
-				Console.WriteLine($"File '{filePath}' not found.");
+				Console.WriteLine($"File not found: {path}");
 			}
 			catch (Exception e)
 			{
-				Console.WriteLine($"An error occurred while reading the CSV file: {e.Message}");
+				Console.WriteLine($"Error reading CSV file: {path}");
+				Console.WriteLine(e.Message);
 			}
 			return data;
 		}
 
-		public void WriteCSV(List<Dictionary<string, string>> data)
+		public static void WriteCsv(List<Dictionary<string, string>> data, string path)
 		{
 			try
 			{
-				using (var writer = new StreamWriter(filePath))
+				using (var writer = new StreamWriter(path))
 				{
 					if (data.Count > 0)
 					{
@@ -71,10 +65,25 @@ namespace CSV_Testing.Classes
 			}
 			catch (Exception e)
 			{
-				Console.WriteLine($"An error occurred while writing to the CSV file: {e.Message}");
+				Console.WriteLine($"Error writing to CSV file: {path}");
+				Console.WriteLine(e.Message);
 			}
 		}
 
+		public static void ClearCsvFile(string filePath)
+		{
+			try
+			{
+				// Open the CSV file and overwrite its content with an empty string
+				File.WriteAllText(filePath, string.Empty);
+				// Console.WriteLine($"CSV file '{filePath}' has been cleared.");
+			}
+			catch (Exception e)
+			{
+				Console.WriteLine($"An error occurred while clearing the CSV file: {e.Message}");
+			}
+		}
+		
 		public static void PrintData(List<Dictionary<string, string>> data)
 		{
 			foreach (var record in data)
