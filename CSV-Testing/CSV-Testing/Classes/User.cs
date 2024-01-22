@@ -2,7 +2,7 @@
 {
 	public class User
 	{
-		public Dictionary<ulong, Book> CheckedOutBooks { get; } = new Dictionary<ulong, Book>();
+		public Dictionary<string, Book> CheckedOutBooks { get; } = new Dictionary<string, Book>();
 
 		///	<summary>
 		///	Attempts to	return a book to the library. Then removes the book	from the user's	checked	out	books.
@@ -10,7 +10,7 @@
 		///	<param name="isbn">The book's key value</param>
 		///	<param name="library">The library that the book	will be	returned to</param>
 		///	<returns>True if the book was successfully returned, false if the book couldn't	be found on	the	called user</returns>
-		public bool ReturnBook(ulong isbn, Library library)
+		public bool ReturnBook(string isbn, Library library)
 		{
 			if (CheckedOutBooks.ContainsKey(isbn))
 			{

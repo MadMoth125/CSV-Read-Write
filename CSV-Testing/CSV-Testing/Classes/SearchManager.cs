@@ -9,7 +9,7 @@ namespace LibraryCatalogSystem
 		///	Prints a catalog of	books, listing each	books internal values
 		///	</summary>
 		///	<param name="books">Dictionary of books</param>
-		public static void PrintBooks(Dictionary<ulong, Book> books)
+		public static void PrintBooks(Dictionary<string, Book> books)
 		{
 			if (books.Count < 1)
 			{
@@ -32,15 +32,15 @@ namespace LibraryCatalogSystem
 		///	</summary>
 		///	<param name="isbn">Key/ISBN	value</param>
 		///	<param name="book">Book	reference</param>
-		public static void PrintBook(ulong isbn, Book book, bool printStatus = true)
+		public static void PrintBook(string isbn, Book book, bool printStatus = true)
 		{
 			if (printStatus)
 			{
-				Console.WriteLine($"{book.Title} by	{book.Author} |	Status:	{book.Status}, ISBN: {isbn:D4}");
+				Console.WriteLine($"{book.Title} by	{book.Author} |	Status:	{book.Status}, ISBN: {isbn}");
 			}
 			else
 			{
-				Console.WriteLine($"{book.Title} by	{book.Author} |	ISBN: {isbn:D4}");
+				Console.WriteLine($"{book.Title} by	{book.Author} |	ISBN: {isbn}");
 			}
 		}
 
@@ -50,7 +50,7 @@ namespace LibraryCatalogSystem
 		///	<param name="isbn">The search parameter</param>
 		///	<param name="catalog">The Dictionary that will be searched</param>
 		///	<param name="results">The returned Dictionary of books that	meet the search	parameters</param>
-		public static void SearchByISBN(ulong isbn, Dictionary<ulong, Book> catalog, out Dictionary<ulong, Book> results)
+		public static void SearchByISBN(string isbn, Dictionary<string, Book> catalog, out Dictionary<string, Book> results)
 		{
 			// using LINQ to filter	results
 			results = catalog.Where(kvp => kvp.Key == isbn)
@@ -65,7 +65,7 @@ namespace LibraryCatalogSystem
 		///	<param name="title">The	search parameter</param>
 		///	<param name="catalog">The Dictionary that will be searched</param>
 		///	<param name="results">The returned Dictionary of books that	meet the search	parameters</param>
-		public static void SearchByTitle(string title, Dictionary<ulong, Book> catalog, out Dictionary<ulong, Book> results)
+		public static void SearchByTitle(string title, Dictionary<string, Book> catalog, out Dictionary<string, Book> results)
 		{
 			// using LINQ to filter	results
 			results = catalog.Where(kvp => kvp.Value.Title.ToLower().Contains(title.ToLower()))
@@ -80,7 +80,7 @@ namespace LibraryCatalogSystem
 		///	<param name="author">The search	parameter</param>
 		///	<param name="catalog">The Dictionary that will be searched</param>
 		///	<param name="results">The returned Dictionary of books that	meet the search	parameters</param>
-		public static void SearchByAuthor(string author, Dictionary<ulong, Book> catalog, out Dictionary<ulong, Book> results)
+		public static void SearchByAuthor(string author, Dictionary<string, Book> catalog, out Dictionary<string, Book> results)
 		{
 			// using LINQ to filter	results
 			results = catalog.Where(kvp => kvp.Value.Author.ToLower().Contains(author.ToLower()))
@@ -94,7 +94,7 @@ namespace LibraryCatalogSystem
 		///	</summary>
 		///	<param name="isbn">The search parameter</param>
 		///	<param name="catalog">The Dictionary that will be searched</param>
-		public static void CheckOutBook(ulong isbn, ref Dictionary<ulong, Book> catalog)
+		public static void CheckOutBook(string isbn, ref Dictionary<string, Book> catalog)
 		{
 			ConsoleHelper.PrintBlank();
 
@@ -122,7 +122,7 @@ namespace LibraryCatalogSystem
 		///	</summary>
 		///	<param name="isbn">The search parameter</param>
 		///	<param name="catalog">The Dictionary that will be searched</param>
-		public static void ReturnBook(ulong isbn, ref Dictionary<ulong, Book> catalog)
+		public static void ReturnBook(string isbn, ref Dictionary<string, Book> catalog)
 		{
 			ConsoleHelper.PrintBlank();
 
