@@ -18,46 +18,17 @@ namespace CSV_Testing
 
 		static void Main(string[] args)
 		{
-			if (File.Exists(_filePath))
-			{
-				CurrentLibrary.LibrarySelection = Library.ConvertCsvToDictionary(CsvFileManager.ReadCsv(_filePath));
-			}
-			else
-			{
-				CurrentLibrary.LibrarySelection = Library.StaticLibrary;
-				// csvManager.WriteCSV();
-			}
-			
+			// Read & apply CSV data.
+			// If the file doesn't exist, use the default library.
+			CurrentLibrary.LibrarySelection = File.Exists(_filePath) ?
+				Library.ConvertCsvToDictionary(CsvFileManager.ReadCsv(_filePath)) :
+				Library.StaticLibrary;
+
 			while (_loopMain)
 			{
 				PrintMenu();
 				SelectMenuOption();
 			}
-
-
-			return;
-
-			// Read CSV
-			var data = CsvFileManager.ReadCsv(_filePath);
-			Console.WriteLine("Data read from CSV:");
-			CsvFileManager.PrintData(data);
-
-			// Modify data (for example, add a new record)
-			Dictionary<string, string> newData = new Dictionary<string, string>
-		{
-			{ "Name", "John Doe" },
-			{ "Age", "30" },
-			{ "City", "Example City" }
-		};
-			data.Add(newData);
-
-			// Write CSV
-			CsvFileManager.WriteCsv(data, _filePath);
-			Console.WriteLine("Data written to CSV:");
-
-			// Read and print the updated data
-			data = CsvFileManager.ReadCsv(_filePath);
-			CsvFileManager.PrintData(data);
 		}
 
 		/// <summary>
@@ -65,7 +36,7 @@ namespace CSV_Testing
 		/// </summary>
 		static void PrintMenu()
 		{
-			Console.WriteLine("Welcome to the smallest Library Catalog");
+			Console.WriteLine("Welcome to the smallest (CSV) Library Catalog");
 			ConsoleHelper.PrintBlank();
 			ConsoleHelper.PrintStrings(menu1, menu2);
 		}
@@ -117,6 +88,7 @@ namespace CSV_Testing
 				case 4: // reset library data
 					CurrentLibrary.LibrarySelection = Library.StaticLibrary;
 					CsvFileManager.WriteCsv(Library.ConvertDictionaryToCsv(CurrentLibrary.LibrarySelection), _filePath);
+					Console.WriteLine("Library data reset to default values.");
 					break;
 				case 5: // exit program
 					tempReturnValue = false;
@@ -129,11 +101,13 @@ namespace CSV_Testing
 			return tempReturnValue;
 		}
 
-		// TODO: made this display the catalog
+		
 		private static void ViewAllBooks()
 		{
-			// Read CSV
+			// Read & apply CSV data
 			CurrentLibrary.LibrarySelection = Library.ConvertCsvToDictionary(CsvFileManager.ReadCsv(_filePath));
+			
+			// print all books
 			SearchManager.PrintBooks(CurrentLibrary.LibrarySelection);
 		}
 
@@ -150,28 +124,19 @@ namespace CSV_Testing
 			Console.Write("Enter the book's author: ");
 			string tempAuthor = GenericReadLine.TryReadLine<string>();
 
+			// clear console to remove prompt text
 			ConsoleHelper.PrintBlank();
+			
 			while (true)
 			{
 				// attempting to add the book to the library
 				if (CurrentLibrary.AddBook(tempISBN, new Book(tempTitle, tempAuthor, BookStatus.Available)))
 				{
-					if (CurrentLibrary.LibrarySelection.TryGetValue(tempISBN, out Book tempBook))
-					{
-						Dictionary<string, Book> tempDictionary = new Dictionary<string, Book>
-						{
-							{ tempISBN, tempBook }
-						};
+					// clear contents of existing csv file
+					CsvFileManager.ClearCsvFile(_filePath);
 						
-						// converting dictionary to csv
-						var tempCsv = Library.ConvertDictionaryToCsv(tempDictionary);
-						
-						// clear contents of existing csv file
-						CsvFileManager.ClearCsvFile(_filePath);
-						
-						// write new csv file
-						CsvFileManager.WriteCsv(tempCsv, _filePath);
-					}
+					// write to the csv file
+					CsvFileManager.WriteCsv(Library.ConvertDictionaryToCsv(CurrentLibrary.LibrarySelection), _filePath);
 					
 					// clearing console and printing menu again to prevent clutter
 					Console.Clear();
@@ -211,6 +176,8 @@ namespace CSV_Testing
 			PrintMenu();
 
 			ConsoleHelper.PrintBlank();
+			
+			// attempting to remove the book from the library
 			if (CurrentLibrary.RemoveBook(tempISBN, out Book removedBook))
 			{
 				Console.WriteLine("Successfully removed book: ");
@@ -227,7 +194,7 @@ namespace CSV_Testing
 			}
 			else
 			{
-				Console.WriteLine("That book is currently not available for check-out...");
+				Console.WriteLine("Unable to remove book.");
 			}
 		}
 	}
